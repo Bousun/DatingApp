@@ -1,3 +1,9 @@
+using System.Xml.XPath;
+using System.Xml.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Mime;
+using System.Runtime.Serialization;
+using System.Net.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +19,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+
+
 
 namespace API
 {
@@ -35,6 +43,13 @@ namespace API
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
+            services.AddCors(c => c.AddPolicy("CorsPolicy", builder => {
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins("https://localhost:4200");}
+
+            ));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -54,6 +69,8 @@ namespace API
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 
